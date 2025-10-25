@@ -1,0 +1,115 @@
+/* ===== 基础渐变背景 ===== */
+html, body {
+    background: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%) !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    min-height: 100vh !important;
+}
+
+/* ===== 完全保留顶部图 - 不设置任何样式 ===== */
+/* 顶部图由Butterfly主题自动管理，我们不干预 */
+
+/* ===== 外层容器透明 ===== */
+main#content-inner.layout {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+/* ===== 去掉 #post 外部容器的边框和背景 ===== */
+#post {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* ===== 文章正文内容区域 - 更透明 ===== */
+#article-container.post-content {
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    padding: 30px !important;
+    margin: 20px 0 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== 首页文章列表项透明 ===== */
+.recent-post-item {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 首页文章悬停效果 */
+.recent-post-item:hover {
+    background: rgba(255, 255, 255, 0.85) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ===== 侧边栏所有卡片透明 ===== */
+.card-widget {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 10px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== 其他页面内容区域透明 ===== */
+.layout_page > div:first-child:not(.recent-posts) {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    padding: 25px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== 恢复底部背景图显示 ===== */
+footer#footer {
+    background-image: url(/images/top.png) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* 确保底部版权信息区域透明 */
+.footer-other,
+.footer-copyright {
+    background: transparent !important;
+    color: #333 !important; /* 确保文字颜色可见 */
+}
+
+/* ===== 代码块和引用块透明 ===== */
+#article-container.post-content pre,
+#article-container.post-content code,
+#article-container.post-content blockquote {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(5px) !important;
+    border-radius: 6px !important;
+}
+
+/* ===== 表格透明 ===== */
+#article-container.post-content table {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(5px) !important;
+    border-radius: 6px !important;
+}
+
+/* ===== 保护图片不透明 ===== */
+#article-container.post-content img,
+.recent-post-item img,
+.card-widget img {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+    border-radius: 6px !important;
+}
