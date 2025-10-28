@@ -75,7 +75,7 @@ main#content-inner.layout {
 
 /* ===== 恢复底部背景图显示 ===== */
 footer#footer {
-    background-image: url(/images/top.png) !important;
+    background-image: url(/images/top.webp) !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
