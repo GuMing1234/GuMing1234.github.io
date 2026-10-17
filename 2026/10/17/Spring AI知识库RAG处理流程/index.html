@@ -1,0 +1,231 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Spring AI 知识库 RAG：从文档到可追溯回答 | GuMing的殿堂</title><meta name="author" content="沽名钓誉之徒"><meta name="copyright" content="沽名钓誉之徒"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="拆解 RAG 的文档导入、分块、向量检索、提示组装、回答评估和权限控制。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring AI 知识库 RAG：从文档到可追溯回答">
+<meta property="og:url" content="https://gumingblog.cn/2026/10/17/Spring%20AI%E7%9F%A5%E8%AF%86%E5%BA%93RAG%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="GuMing的殿堂">
+<meta property="og:description" content="拆解 RAG 的文档导入、分块、向量检索、提示组装、回答评估和权限控制。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%B5%B7%E6%B5%AA.jpg">
+<meta property="article:published_time" content="2026-10-17T04:50:00.000Z">
+<meta property="article:modified_time" content="2026-10-17T12:29:27.092Z">
+<meta property="article:author" content="沽名钓誉之徒">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="Spring AI">
+<meta property="article:tag" content="向量数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%B5%B7%E6%B5%AA.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Spring AI 知识库 RAG：从文档到可追溯回答",
+  "url": "https://gumingblog.cn/2026/10/17/Spring%20AI%E7%9F%A5%E8%AF%86%E5%BA%93RAG%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/",
+  "image": "https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%B5%B7%E6%B5%AA.jpg",
+  "datePublished": "2026-10-17T04:50:00.000Z",
+  "dateModified": "2026-10-17T12:29:27.092Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "沽名钓誉之徒",
+      "url": "https://gumingblog.cn"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://gumingblog.cn/2026/10/17/Spring%20AI%E7%9F%A5%E8%AF%86%E5%BA%93RAG%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Spring AI 知识库 RAG：从文档到可追溯回答',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"><link rel="stylesheet" href="/css/mycss.css"><meta name="generator" content="Hexo 8.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/%E7%A7%A6%E5%A7%8B%E7%9A%87%E5%A4%B4%E5%83%8F.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%B5%B7%E6%B5%AA.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">GuMing的殿堂</span></a><a class="nav-page-title" href="/"><span class="site-name">Spring AI 知识库 RAG：从文档到可追溯回答</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Spring AI 知识库 RAG：从文档到可追溯回答</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-17T04:50:00.000Z" title="发表于 2026-10-17 12:50:00">2026-10-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-17T12:29:27.092Z" title="更新于 2026-10-17 20:29:27">2026-10-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI%E5%BA%94%E7%94%A8/">AI应用</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Spring-AI-知识库-RAG：从文档到可追溯回答"><a href="#Spring-AI-知识库-RAG：从文档到可追溯回答" class="headerlink" title="Spring AI 知识库 RAG：从文档到可追溯回答"></a>Spring AI 知识库 RAG：从文档到可追溯回答</h1><p>大语言模型并不知道刚刚更新的内部资料，也不能保证每个事实都正确。检索增强生成（RAG）会先从应用自己的知识库中找相关内容，再把检索结果作为上下文交给模型生成回答。</p>
+<h2 id="1-RAG-的两条流程"><a href="#1-RAG-的两条流程" class="headerlink" title="1. RAG 的两条流程"></a>1. RAG 的两条流程</h2><p><strong>离线导入流程：</strong></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">读取文档 → 清理与拆分 → 添加元数据 → 生成向量 → 写入向量存储<br></code></pre></td></tr></table></figure>
+
+<p><strong>在线问答流程：</strong></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">用户问题 → 可选查询改写 → 向量检索与过滤 → 组装上下文 → 模型生成 → 返回答案和来源<br></code></pre></td></tr></table></figure>
+
+<p>Spring AI 将文档读取、转换和写入向量存储组织为 ETL 组件，也提供向量存储和 RAG Advisor 等抽象。具体类名和依赖会随版本变化，应先固定 Spring AI BOM，再按对应版本文档实现。</p>
+<h2 id="2-文档拆分与元数据"><a href="#2-文档拆分与元数据" class="headerlink" title="2. 文档拆分与元数据"></a>2. 文档拆分与元数据</h2><p>切块太大时，检索结果可能包含大量无关内容；切块太小则上下文断裂，答案缺少必要定义。可以从段落、标题和 token 长度综合拆分，再在相邻块之间设置适量重叠。</p>
+<p>每块最好保留来源文件、标题、章节、更新时间、访问范围等元数据。元数据有助于过滤和展示引用，也能支持文档更新时删除旧版本。敏感文档需要在检索之前按用户权限过滤，不能把所有内容送给模型后再要求模型自行保密。</p>
+<h2 id="3-向量检索不是全文搜索的替代品"><a href="#3-向量检索不是全文搜索的替代品" class="headerlink" title="3. 向量检索不是全文搜索的替代品"></a>3. 向量检索不是全文搜索的替代品</h2><p>Embedding 把文本映射为向量，系统按相似度找候选内容。向量相似不等于事实相关，也可能漏掉精确编号、专有名词或否定条件。可以结合关键词检索、元数据过滤和重排，并通过真实问题集调节 top-k 与相似度阈值。</p>
+<p>如果检索结果为空或相关度不足，系统应允许回答“资料中没有找到依据”，而不是强迫模型编造答案。返回答案时尽量附上文档标题、章节或链接，方便用户核对。</p>
+<h2 id="4-评估要覆盖检索和生成"><a href="#4-评估要覆盖检索和生成" class="headerlink" title="4. 评估要覆盖检索和生成"></a>4. 评估要覆盖检索和生成</h2><p>只看回答是否流畅不够。至少分别评估：</p>
+<ul>
+<li>**检索质量：**正确文档是否进入候选结果，是否有过多无关内容？</li>
+<li>**答案忠实度：**回答中的事实能否在检索上下文中找到依据？</li>
+<li>**拒答行为：**没有证据时是否明确说明不知道？</li>
+<li>**权限隔离：**不同用户是否只能检索有权访问的文档？</li>
+<li>**数据更新：**删除、修改和重新导入后，旧向量是否被清理？</li>
+</ul>
+<p>用一组人工标注的问题建立回归集，记录文档版本、检索参数和模型版本，才能判断改动是否真的改善结果。</p>
+<h2 id="5-安全和数据治理"><a href="#5-安全和数据治理" class="headerlink" title="5. 安全和数据治理"></a>5. 安全和数据治理</h2><p>检索到的文档本身也可能包含恶意指令或过时内容。把文档内容作为数据处理，而非系统指令；限制模型可调用的工具权限，并避免向模型发送完成任务不需要的个人信息。日志中也要处理敏感问题和检索片段。</p>
+<h2 id="6-小结"><a href="#6-小结" class="headerlink" title="6. 小结"></a>6. 小结</h2><p>RAG 的质量取决于文档治理、分块、检索、权限、提示和评估的整体流程。向量数据库只解决其中一环，不会自动保证答案准确。先建立一个小而可评估的知识集，再逐步扩展文档和检索策略。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html">Spring AI Retrieval Augmented Generation 文档</a>、<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html">Spring AI ETL Pipeline 文档</a>。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://gumingblog.cn">沽名钓誉之徒</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://gumingblog.cn/2026/10/17/Spring%20AI%E7%9F%A5%E8%AF%86%E5%BA%93RAG%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">https://gumingblog.cn/2026/10/17/Spring%20AI%E7%9F%A5%E8%AF%86%E5%BA%93RAG%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://gumingblog.cn" target="_blank">GuMing的殿堂</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Spring-AI/">Spring AI</a><a class="post-meta__tags" href="/tags/RAG/">RAG</a><a class="post-meta__tags" href="/tags/%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93/">向量数据库</a></div><div class="post-share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%B5%B7%E6%B5%AA.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/10/17/Spring%20AI%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E4%B8%8EFunction%20Calling/" title="Spring AI 工具调用：从 Function Calling 到受控执行"><img class="cover" src="https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%98%A5.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Spring AI 工具调用：从 Function Calling 到受控执行</div></div><div class="info-2"><div class="info-item-1">解释模型如何请求应用工具、应用如何执行并回传结果，以及工具调用的安全边界。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/10/17/Spring%20AI%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E4%B8%8EFunction%20Calling/" title="Spring AI 工具调用：从 Function Calling 到受控执行"><img class="cover" src="https://cdn.jsdelivr.net/gh/GuMing1234/img/img/%E6%98%A5.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-17</div><div class="info-item-2">Spring AI 工具调用：从 Function Calling 到受控执行</div></div><div class="info-2"><div class="info-item-1">解释模型如何请求应用工具、应用如何执行并回传结果，以及工具调用的安全边界。</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="lv-container" data-id="city" data-uid="MTAyMC82MDk3My8zNzQ0Mw=="></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spring-AI-%E7%9F%A5%E8%AF%86%E5%BA%93-RAG%EF%BC%9A%E4%BB%8E%E6%96%87%E6%A1%A3%E5%88%B0%E5%8F%AF%E8%BF%BD%E6%BA%AF%E5%9B%9E%E7%AD%94"><span class="toc-number">1.</span> <span class="toc-text">Spring AI 知识库 RAG：从文档到可追溯回答</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-RAG-%E7%9A%84%E4%B8%A4%E6%9D%A1%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1. RAG 的两条流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%96%87%E6%A1%A3%E6%8B%86%E5%88%86%E4%B8%8E%E5%85%83%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.</span> <span class="toc-text">2. 文档拆分与元数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E4%B8%8D%E6%98%AF%E5%85%A8%E6%96%87%E6%90%9C%E7%B4%A2%E7%9A%84%E6%9B%BF%E4%BB%A3%E5%93%81"><span class="toc-number">1.3.</span> <span class="toc-text">3. 向量检索不是全文搜索的替代品</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%AF%84%E4%BC%B0%E8%A6%81%E8%A6%86%E7%9B%96%E6%A3%80%E7%B4%A2%E5%92%8C%E7%94%9F%E6%88%90"><span class="toc-number">1.4.</span> <span class="toc-text">4. 评估要覆盖检索和生成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%AE%89%E5%85%A8%E5%92%8C%E6%95%B0%E6%8D%AE%E6%B2%BB%E7%90%86"><span class="toc-number">1.5.</span> <span class="toc-text">5. 安全和数据治理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%B0%8F%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">6. 小结</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(https://cdn.jsdelivr.net/gh/GuMing1234/img/img/top.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By 沽名钓誉之徒</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.0.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.1</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.1"></script><script src="/js/main.js?v=5.5.1"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+
+  const loadLivere = (el, path) => {
+    window.livereOptions = {
+      refer: path || location.pathname
+    }
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyLivere = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    if (typeof LivereTower === 'object') window.LivereTower.init()
+    else {
+      (function(d, s) {
+          var j, e = d.getElementsByTagName(s)[0];
+          if (typeof LivereTower === 'function') { return; }
+          j = d.createElement(s);
+          j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+          j.async = true;
+          e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    }
+  }
+
+  if (isShuoshuo) {
+    'Livere' === 'Livere'
+      ? window.shuoshuoComment = { loadComment: loadLivere }
+      : window.loadOtherComment = loadLivere
+    return
+  }
+
+  if ('Livere' === 'Livere' || !true) {
+    if (true) btf.loadComment(document.getElementById('lv-container'), loadLivere)
+    else loadLivere()
+  } else {
+    window.loadOtherComment = loadLivere
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
